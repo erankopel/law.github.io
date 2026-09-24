@@ -1,0 +1,1036 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="בחינת סימולציה בדיני מיסים במבנה הבחינה האמיתית: 3 שעות, מונה מילים, תשובות מודל ומחוון לציון עצמי.">
+<title>סימולציה בדיני מיסים</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@400;600;700;800&family=Noto+Serif+Hebrew:wght@600;700&display=swap">
+<style>
+  :root {
+    --bg:#f3f7f8; --surface:#ffffff; --surface-2:#edf5f6; --ink:#13272d; --muted:#526970;
+    --blue:#0c6980; --blue-deep:#074959; --green:#16745a; --green-soft:#e4f4ed; --line:#c9dadd;
+    --warm:#fbf4df; --warm-line:#e9d9a6; --focus:#e59b18; --on-accent:#ffffff; --accent-hover:#074959;
+    --warn:#8a5a00; --warn-soft:#fbf1dc; --crit:#b3261e; --crit-soft:#fbe9e7;
+    --rule:rgba(12,105,128,.14); --bar:rgba(255,255,255,.94);
+    --shadow:0 8px 24px rgba(12,65,76,.08);
+    --sans:"Noto Sans Hebrew","Arial Hebrew","Segoe UI",Arial,sans-serif;
+    --serif:"Noto Serif Hebrew","Frank Ruehl CLM","David",Georgia,serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg:#0c171a; --surface:#122327; --surface-2:#183036; --ink:#edf7f7; --muted:#acc3c7;
+      --blue:#66c7da; --blue-deep:#9eddea; --green:#6ed0a8; --green-soft:#173a31; --line:#2d4b51;
+      --warm:#342d19; --warm-line:#665c35; --focus:#ffc35c; --on-accent:#08262d; --accent-hover:#9eddea;
+      --warn:#f1bc5c; --warn-soft:#3a2e14; --crit:#ff8f84; --crit-soft:#3d1c19;
+      --rule:rgba(102,199,218,.12); --bar:rgba(18,35,39,.94);
+      --shadow:0 12px 28px rgba(0,0,0,.25);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg:#0c171a; --surface:#122327; --surface-2:#183036; --ink:#edf7f7; --muted:#acc3c7;
+    --blue:#66c7da; --blue-deep:#9eddea; --green:#6ed0a8; --green-soft:#173a31; --line:#2d4b51;
+    --warm:#342d19; --warm-line:#665c35; --focus:#ffc35c; --on-accent:#08262d; --accent-hover:#9eddea;
+    --warn:#f1bc5c; --warn-soft:#3a2e14; --crit:#ff8f84; --crit-soft:#3d1c19;
+    --rule:rgba(102,199,218,.12); --bar:rgba(18,35,39,.94);
+    --shadow:0 12px 28px rgba(0,0,0,.25);
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display:none !important; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:400 16px/1.7 var(--sans); }
+  h1, h2, h3 { font-family:var(--serif); line-height:1.3; text-wrap:balance; margin:0; }
+  a { color:var(--blue); }
+  :focus-visible { outline:3px solid var(--focus); outline-offset:2px; border-radius:6px; }
+  .num { font-variant-numeric:tabular-nums; direction:ltr; unicode-bidi:isolate; display:inline-block; }
+
+  /* ---------- top bar ---------- */
+  .bar { position:sticky; top:env(safe-area-inset-top, 0px); z-index:30; background:var(--bar);
+    backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border-bottom:1px solid var(--line); }
+  .bar-in { max-width:880px; margin:0 auto; padding:10px 16px; display:flex; align-items:center; gap:10px; }
+  .brand { flex:1; min-width:0; display:grid; line-height:1.25; }
+  .brand b { font-family:var(--serif); font-size:1.02rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .brand span { font-size:.78rem; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .clock { font:800 1.3rem/1 var(--sans); font-variant-numeric:tabular-nums; direction:ltr; unicode-bidi:isolate;
+    padding:8px 12px; border-radius:10px; background:var(--surface-2); border:1px solid var(--line); color:var(--ink); }
+  .clock.warn { color:var(--warn); background:var(--warn-soft); border-color:var(--warm-line); }
+  .clock.crit, .clock.over { color:var(--crit); background:var(--crit-soft); border-color:var(--crit); }
+  .clock.done { color:var(--green); background:var(--green-soft); border-color:var(--green); font-size:1rem; }
+  .bar-actions { display:flex; gap:8px; }
+  .progress { height:3px; background:var(--line); }
+  .progress span { display:block; height:100%; width:0; background:var(--blue); transition:width .6s linear; }
+  .progress.warn span { background:var(--warn); }
+  .progress.crit span, .progress.over span { background:var(--crit); }
+  .drawer { max-width:880px; margin:0 auto; padding:0 16px 12px; display:flex; flex-wrap:wrap; align-items:center; gap:10px; }
+  .drawer p { margin:0; flex:1 1 260px; font-size:.95rem; }
+  .drawer .row { display:flex; gap:8px; flex-wrap:wrap; }
+
+  /* ---------- controls ---------- */
+  .btn { font:inherit; font-weight:700; font-size:.95rem; line-height:1.2; border:1px solid var(--line); background:var(--surface);
+    color:var(--ink); padding:9px 14px; min-height:40px; border-radius:10px; cursor:pointer; text-decoration:none;
+    display:inline-flex; align-items:center; justify-content:center; gap:6px; }
+  .btn:hover { border-color:var(--blue); }
+  .btn.primary { background:var(--blue); border-color:var(--blue); color:var(--on-accent); }
+  .btn.primary:hover { background:var(--accent-hover); border-color:var(--accent-hover); }
+  .btn.danger { color:var(--crit); border-color:var(--crit); background:transparent; }
+  .btn.quiet { background:transparent; }
+  .btn.big { padding:13px 22px; font-size:1.05rem; }
+  .btn[disabled] { opacity:.55; cursor:not-allowed; }
+
+  /* ---------- page ---------- */
+  .wrap { max-width:880px; margin:0 auto; padding-inline:16px; padding-block:20px 72px; display:grid; gap:22px; }
+  .sheet { background:var(--surface); border:1px solid var(--line); border-radius:14px; box-shadow:var(--shadow); }
+  .eyebrow { font-size:.78rem; font-weight:700; letter-spacing:.04em; color:var(--muted); }
+
+  /* cover = exam booklet front page */
+  .cover { padding:24px 20px; display:grid; gap:22px; }
+  .cover-head { display:grid; gap:8px; }
+  .cover-head h1 { font-size:clamp(1.55rem, 4.8vw, 2.1rem); }
+  .cover-head p { margin:0; color:var(--muted); max-width:62ch; }
+  .meta { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:10px; overflow:hidden; margin:0; }
+  .meta div { padding:10px 12px; background:var(--surface); }
+  @media (min-width:680px) { .meta { grid-template-columns:repeat(4, minmax(0, 1fr)); } }
+  .meta dt { font-size:.75rem; color:var(--muted); font-weight:700; }
+  .meta dd { margin:0; font-weight:700; }
+  .tbl-wrap { overflow-x:auto; border:1px solid var(--line); border-radius:10px; }
+  table { border-collapse:collapse; width:100%; font-size:.93rem; }
+  th, td { text-align:start; padding:9px 12px; border-bottom:1px solid var(--line); white-space:nowrap; }
+  th { background:var(--surface-2); font-size:.8rem; color:var(--muted); }
+  tr:last-child td { border-bottom:0; }
+  td.num-c { font-variant-numeric:tabular-nums; }
+  .rules { margin:0; padding-inline-start:1.2em; display:grid; gap:6px; max-width:68ch; }
+  .sig { display:flex; flex-wrap:wrap; align-items:center; gap:6px; font-weight:700; }
+  .sig span { background:var(--surface-2); border:1px solid var(--line); border-radius:8px; padding:3px 10px; }
+  .sig i { font-style:normal; color:var(--muted); }
+  .modes { display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:10px; border:0; padding:0; margin:0; }
+  .modes legend { font-weight:800; margin-bottom:8px; padding:0; }
+  .mode { display:flex; gap:10px; align-items:flex-start; padding:12px 14px; border:1px solid var(--line); border-radius:12px; cursor:pointer; background:var(--surface); }
+  .mode:has(input:checked) { border-color:var(--blue); background:var(--surface-2); box-shadow:inset 0 0 0 1px var(--blue); }
+  .mode input { margin-top:6px; accent-color:var(--blue); }
+  .mode b { display:block; }
+  .mode small { color:var(--muted); font-size:.86rem; line-height:1.5; display:block; }
+  .start-row { display:flex; flex-wrap:wrap; align-items:center; gap:12px; }
+  .start-row small { color:var(--muted); flex:1 1 240px; }
+
+  /* result */
+  .result { padding:22px 20px; display:grid; gap:18px; }
+  .score-head { display:flex; flex-wrap:wrap; align-items:flex-end; gap:8px 24px; }
+  .score-big { font:800 3.2rem/1 var(--sans); font-variant-numeric:tabular-nums; color:var(--blue); }
+  .score-big small { font-size:1rem; color:var(--muted); font-weight:700; }
+  .score-side { display:grid; gap:2px; color:var(--muted); font-size:.92rem; }
+  .parts-score { display:grid; gap:10px; }
+  .ps { display:grid; grid-template-columns:minmax(0, 1fr) auto; gap:4px 12px; align-items:center; }
+  .ps .lbl { font-weight:700; font-size:.93rem; }
+  .ps .val { font-variant-numeric:tabular-nums; font-weight:800; }
+  .ps .track { grid-column:1 / -1; height:8px; border-radius:99px; background:var(--surface-2); border:1px solid var(--line); overflow:hidden; }
+  .ps .track span { display:block; height:100%; background:var(--green); }
+  .ps .why { grid-column:1 / -1; font-size:.82rem; color:var(--muted); }
+  .result-actions { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  .copybox { width:100%; min-height:8rem; font:inherit; font-size:.85rem; }
+  .inline-confirm { display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:10px 12px; border:1px solid var(--crit); background:var(--crit-soft); border-radius:10px; }
+  .inline-confirm span { flex:1 1 220px; font-size:.93rem; }
+
+  /* exam */
+  .guide { padding:0; }
+  .guide summary { cursor:pointer; padding:12px 16px; font-weight:800; list-style-position:inside; }
+  .guide .guide-body { padding:0 16px 16px; display:grid; gap:12px; }
+  .partnav { display:flex; flex-wrap:wrap; gap:8px; }
+  .chip { display:inline-flex; align-items:center; gap:6px; padding:5px 11px; border-radius:99px; border:1px solid var(--line);
+    background:var(--surface); font-size:.85rem; font-weight:700; color:var(--ink); text-decoration:none; white-space:nowrap; }
+  a.chip:hover { border-color:var(--blue); }
+  .chip.ok { background:var(--green-soft); border-color:var(--green); color:var(--green); }
+  .chip.bad { background:var(--crit-soft); border-color:var(--crit); color:var(--crit); }
+  .chip.soft { background:var(--surface-2); color:var(--muted); }
+  .chip.warm { background:var(--warm); border-color:var(--warm-line); }
+  .part { display:grid; gap:14px; scroll-margin-top:90px; }
+  .part-head { display:grid; gap:4px; padding-top:6px; border-top:2px solid var(--ink); }
+  .part-head h2 { font-size:1.35rem; padding-top:10px; }
+  .part-meta { display:flex; flex-wrap:wrap; gap:6px 14px; color:var(--muted); font-size:.9rem; }
+  .part-meta b { color:var(--ink); }
+  .q { padding:18px 16px; display:grid; gap:14px; scroll-margin-top:90px; }
+  .q-head { display:flex; flex-wrap:wrap; align-items:baseline; gap:6px 10px; }
+  .q-no { font-weight:800; color:var(--blue); font-size:.9rem; }
+  .q-head h3 { font-size:1.12rem; flex:1 1 220px; }
+  .q-pts { font-size:.85rem; font-weight:700; color:var(--muted); font-variant-numeric:tabular-nums; }
+  .stem { margin:0; padding:14px 16px; background:var(--surface-2); border-radius:10px; max-width:none; }
+  .sp { display:grid; gap:8px; }
+  .sp > label { font-weight:700; display:flex; gap:8px; align-items:baseline; justify-content:space-between; flex-wrap:wrap; }
+  .sp > label em { font-style:normal; font-size:.8rem; color:var(--muted); font-weight:700; white-space:nowrap; font-variant-numeric:tabular-nums; }
+  textarea.ans { width:100%; min-height:7.5rem; resize:vertical; font:400 16px/1.9 var(--sans); color:var(--ink);
+    padding:0 12px; border:1px solid var(--line); border-radius:10px; background-color:var(--surface);
+    background-image:repeating-linear-gradient(to bottom, transparent 0, transparent calc(1.9em - 1px), var(--rule) calc(1.9em - 1px), var(--rule) 1.9em);
+    background-attachment:local; background-position:0 .45em; padding-block:.45em; overflow:hidden; }
+  textarea.ans:focus { border-color:var(--blue); outline:none; box-shadow:0 0 0 3px color-mix(in srgb, var(--blue) 25%, transparent); }
+  textarea.ans[readonly] { background-color:var(--bg); }
+  .q-foot { display:flex; flex-wrap:wrap; gap:8px 12px; align-items:center; }
+  .meter { flex:1 1 200px; display:grid; gap:4px; }
+  .meter .track { height:6px; border-radius:99px; background:var(--surface-2); border:1px solid var(--line); overflow:hidden; }
+  .meter .track span { display:block; height:100%; width:0; background:var(--blue); }
+  .meter.near .track span { background:var(--warn); }
+  .meter.over .track span { background:var(--crit); }
+  .meter small { font-size:.82rem; color:var(--muted); font-variant-numeric:tabular-nums; }
+  .meter.over small { color:var(--crit); font-weight:700; }
+  .review { display:grid; gap:10px; padding:14px; border-radius:10px; background:var(--green-soft); border:1px solid color-mix(in srgb, var(--green) 45%, transparent); }
+  .review h4 { margin:0; font-size:.85rem; letter-spacing:.03em; color:var(--green); }
+  .review p { margin:0; white-space:pre-line; font-size:.97rem; line-height:1.75; }
+  .rubric { border:0; margin:0; padding:0; display:grid; gap:6px; }
+  .rubric legend { font-size:.85rem; font-weight:800; color:var(--green); padding:0; margin-bottom:4px; }
+  .rb { display:grid; grid-template-columns:auto 1fr auto; gap:10px; align-items:start; padding:8px 10px; background:var(--surface); border:1px solid var(--line); border-radius:8px; cursor:pointer; font-size:.93rem; line-height:1.5; }
+  .rb input { width:18px; height:18px; margin-top:2px; accent-color:var(--green); }
+  .rb b { font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .rb:has(input:checked) { border-color:var(--green); }
+  .rb:has(input:disabled) { cursor:default; }
+  .sp-score { font-size:.85rem; font-weight:800; color:var(--green); font-variant-numeric:tabular-nums; }
+
+  body.paused .exam { filter:blur(7px); pointer-events:none; user-select:none; }
+  .foot { display:flex; flex-wrap:wrap; gap:8px 16px; justify-content:space-between; color:var(--muted); font-size:.85rem; border-top:1px solid var(--line); padding-top:16px; }
+  .foot nav { display:flex; flex-wrap:wrap; gap:8px 16px; }
+
+  @media (max-width:520px) {
+    .brand span { display:none; }
+    .clock { font-size:1.12rem; padding:7px 9px; }
+    .bar-actions .btn { padding:8px 10px; }
+    .cover, .result { padding:20px 16px; }
+    .q { padding:16px 14px; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition:none !important; scroll-behavior:auto !important; } }
+  @media (prefers-reduced-motion: no-preference) { html { scroll-behavior:smooth; } }
+</style>
+</head>
+<body>
+
+<script>document.documentElement.setAttribute("dir","rtl");document.documentElement.setAttribute("lang","he");</script>
+<div class="page" dir="rtl" lang="he">
+<header class="bar" id="bar">
+  <div class="bar-in">
+    <div class="brand"><b>דיני מיסים · סימולציה</b><span id="barSub">מועד ג׳ · 180 דקות</span></div>
+    <div class="clock" id="clock" role="timer" aria-label="זמן שנותר">3:00:00</div>
+    <div class="bar-actions">
+      <button class="btn quiet" id="pauseBtn" type="button" hidden>השהיה</button>
+      <button class="btn primary" id="submitBtn" type="button" hidden>הגשה</button>
+      <a class="btn primary" id="toResultBtn" href="#result" hidden>לציון</a>
+    </div>
+  </div>
+  <div class="drawer" id="notice" hidden>
+    <p id="noticeText"></p>
+    <div class="row" id="noticeActions"></div>
+  </div>
+  <div class="progress" id="progress"><span id="progFill"></span></div>
+</header>
+
+<main class="wrap">
+  <section class="sheet cover" id="cover" aria-labelledby="coverTitle">
+    <div class="cover-head">
+      <div class="eyebrow">בחינת סימולציה · מבנה זהה לבחינה</div>
+      <h1 id="coverTitle">דיני מיסים — סימולציה, מועד ג׳</h1>
+      <p>12 שאלות חדשות על החומר שבבחינה, בחלוקה ובמכסות של הבחינה האמיתית. בסיום נפתחות תשובות מודל ומחוון, ואתם בודקים את עצמכם.</p>
+    </div>
+
+    <dl class="meta">
+      <div><dt>קורס</dt><dd>דיני מיסים · שנה ג׳</dd></div>
+      <div><dt>מרצה</dt><dd>עו״ד חן אבידוב</dd></div>
+      <div><dt>משך</dt><dd>180 דקות</dd></div>
+      <div><dt>חומר עזר</dt><dd>סגור · חקיקה וסילבוס</dd></div>
+    </dl>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>חלק</th><th>משקל</th><th>שאלות</th><th>מילים לשאלה</th><th>זמן מומלץ</th></tr></thead>
+        <tbody id="structBody"></tbody>
+      </table>
+    </div>
+
+    <div style="display:grid; gap:10px;">
+      <b>הוראות</b>
+      <ol class="rules">
+        <li>חומר סגור. בבחינה מצורפים קובצי החקיקה והסילבוס, אז אפשר לעבוד עם פקודת מס הכנסה וחוק מיסוי מקרקעין פתוחים לצידכם.</li>
+        <li>בחלקים א׳ ו־ג׳ ענו רק על מספר השאלות הנדרש. בציון העצמי נספרות השאלות עם הציון הגבוה.</li>
+        <li>מונה המילים מסמן חריגה מהמכסה. התרגלו לעמוד בה, כי תשובה ארוכה מדי פוגעת בתשובה.</li>
+        <li>התשובות נשמרות אוטומטית בדפדפן הזה בלבד. הטיימר ממשיך לרוץ גם כשהדף סגור, אז לעצירה השתמשו בהשהיה.</li>
+      </ol>
+    </div>
+
+    <div style="display:grid; gap:8px;">
+      <b>מבנה תשובה מומלץ לשאלות היישומיות</b>
+      <div class="sig"><span>סיווג</span><i>←</i><span>נפקות</span><i>←</i><span>מפת אינטרסים</span><i>←</i><span>חלופות</span></div>
+      <small style="color:var(--muted)">כל טענה מעוגנת בסעיף חוק ובפסק דין.</small>
+    </div>
+
+    <fieldset class="modes">
+      <legend>איך לעבוד?</legend>
+      <label class="mode"><input type="radio" name="mode" id="modeExam" value="exam" checked><span><b>תנאי בחינה</b><small>תשובות המודל נעולות עד ההגשה.</small></span></label>
+      <label class="mode"><input type="radio" name="mode" id="modePractice" value="practice"><span><b>תרגול</b><small>אפשר להציץ בתשובת המודל של כל שאלה תוך כדי כתיבה.</small></span></label>
+    </fieldset>
+
+    <div class="start-row">
+      <button class="btn primary big" id="startBtn" type="button">התחלת הבחינה · 3:00 שעות</button>
+      <small>הטיימר מתחיל עם הלחיצה. השאלות נפתחות אחריה.</small>
+    </div>
+  </section>
+
+  <section class="sheet result" id="result" hidden aria-labelledby="resultTitle">
+    <div class="eyebrow">ציון עצמי לפי המחוון</div>
+    <div class="score-head">
+      <div class="score-big" id="scoreBig">0<small> / 100</small></div>
+      <div class="score-side">
+        <span id="scoreBonus"></span>
+        <span id="scoreTime"></span>
+        <span id="scoreWords"></span>
+      </div>
+    </div>
+    <h2 id="resultTitle" style="font-size:1.05rem;">סמנו בכל שאלה את רכיבי המחוון שהתשובה שלכם כוללת. הציון מתעדכן מיד.</h2>
+    <div class="parts-score" id="partsScore"></div>
+    <div class="result-actions">
+      <button class="btn" id="copyBtn" type="button">העתקת התשובות שלי</button>
+      <button class="btn danger" id="resetBtn2" type="button">בחינה חדשה</button>
+      <span id="copyMsg" class="eyebrow" role="status"></span>
+    </div>
+    <div id="resetConfirm2" hidden></div>
+    <textarea class="copybox" id="copyBox" readonly hidden aria-label="התשובות שלכם כטקסט"></textarea>
+  </section>
+
+  <div class="exam" id="exam" hidden>
+    <div style="display:grid; gap:14px;">
+      <details class="sheet guide" id="guide">
+        <summary>הוראות ומבנה הבחינה</summary>
+        <div class="guide-body" id="guideBody"></div>
+      </details>
+      <nav class="partnav" id="partnav" aria-label="חלקי הבחינה"></nav>
+    </div>
+    <div id="parts" style="display:grid; gap:34px; margin-top:22px;"></div>
+  </div>
+
+  <footer class="foot">
+    <span>שאלות ותשובות מודל שנכתבו לתרגול על פי חומרי הקורס. אינן תשובות רשמיות של המרצה.</span>
+    <nav><a href="review.html">חזרה לבחינה (56 שאלות)</a><a href="./">אתר מיקוד — דיני מיסים</a></nav>
+  </footer>
+</main>
+</div>
+
+<script>
+const EXAM = {
+  id: `sim-c-2026`,
+  title: `סימולציה — מועד ג׳`,
+  minutes: 180,
+  parts: [
+    {
+      key: `A`, name: `חלק א׳ — שאלות יישומיות`, weight: `60%`, pick: 4, words: 360,
+      note: `חמש שאלות — ענו על ארבע. כל שאלה 15 נקודות, עד 360 מילים לשאלה.`, suggest: `כ־25 דקות לשאלה`,
+      questions: [
+        {
+          n: 1, points: 15, title: `אוסף השעונים של ד״ר לוי`,
+          stem: `ד״ר מיכל לוי, רופאת שיניים עצמאית, אוספת שעוני יד יוקרתיים מזה 15 שנה. את רוב השעונים רכשה בהדרגה, לעתים בהלוואות גישור קצרות מהבנק. הם מוחזקים בכספת בביתה, ואת חלקם היא עונדת באירועים. לפני שלוש שנים פתחה חשבון אינסטגרם על שעונים, שצבר 40 אלף עוקבים, והחלה לקבל הצעות רכישה. בשנתיים האחרונות מכרה 38 שעונים — חלקם דרך בית מכירות פומביות בז׳נבה וחלקם ישירות לעוקבים — ברווח כולל של 4.2 מיליון ש״ח. באותה תקופה רכשה 9 שעונים חדשים, שלדבריה "משלימים את האוסף". שלושה מהשעונים נמכרו בהפסד כולל של 300 אלף ש״ח. בדוח השנתי לא דיווחה על המכירות, בטענה שמדובר בחפצים לשימושה האישי.`,
+          subparts: [
+            {
+              q: `סעיף א׳ — כיצד יש לסווג את התמורה ממכירת השעונים? הציגו את החלופות, את נפקותן ואת מפת האינטרסים.`, points: 8,
+              model: `שלוש חלופות. (1) מחוץ לבסיס המס: ס׳ 88 מחריג מהגדרת "נכס" מיטלטלין של יחיד המוחזקים לשימושו האישי. בעניין יבדייב נבחן תחילה אם יש עסקה בעלת אופי מסחרי, ורק אחר כך אם הקערה היא מיטלטלין אישיים — ומשנמצאה כזו, המכירה כלל לא נכנסה לבסיס. (2) רווח הון לפי חלק ה׳: אם השעונים הם אוסף השקעה ולא חפצים לשימוש אישי, הם "נכס", והרווח הריאלי ימוסה בשיעור של עד 25% ליחיד (ס׳ 91(ב)), בתוספת מס יסף. (3) הכנסה פירותית לפי ס׳ 2(1) — עסק או עסקה בעלת אופי מסחרי — במס שולי עד 47%, ועם מס יסף. מפת האינטרסים: ד״ר לוי תטען לחלופה הראשונה ולחלופין לשנייה; פקיד השומה יטען לשלישית. יישום: אלמור דורש מסחריות ומטרה כלכלית — כוונת רווח לבדה אינה מספיקה. מבחני העזר מושכים כאן לכיוון פירותי: תדירות והיקף (38 מכירות בשנתיים, 4.2 מיליון ש״ח), מנגנון שיווק (חשבון אינסטגרם, בית מכירות), בקיאות, מימון בהלוואות, ורכישות חדשות במקביל למכירות. מנגד, משך החזקה ארוך ותחילת הפעילות כתחביב מושכים לכיוון ההוני. מבחן הגג (מגיד) מכריע לפי מכלול הנסיבות. לזכות ד״ר לוי: החרגת המיטלטלין האישיים בס׳ 88 חלה גם על נכסים במישור התחביבי ועל אוספים. לכן השאלה המכרעת אינה אם השעונים נענדים, אלא אם הפעילות חצתה מתחביב לפעילות מסחרית — ולפי יבדייב, זו השאלה שנבחנת ראשונה. תורת הכובעים מאפשרת לזהות מעבר מ"כובע" פרטי ל"כובע" מסחרי, אך מועד השינוי דורש ראיה חיצונית (מבני ידידיה, נווה שאנן) — כאן פתיחת החשבון ותחילת המכירות. סגירה: אם יש ספק בין הוני לפירותי — ס׳ 89(ג) קובע שהפירותי גובר. תשובה טובה תדון גם באפשרות לפצל לפי מועד: שעונים שנרכשו ונמכרו במסגרת הפעילות המסחרית מול האוסף הוותיק.`,
+              rubric: [
+                { t: `זיהוי שלוש החלופות: מחוץ לבסיס (ס׳ 88), הוני (חלק ה׳), פירותי (ס׳ 2(1))`, p: 2 },
+                { t: `יבדייב — סדר הבדיקה והחרגת מיטלטלין אישיים`, p: 1 },
+                { t: `יישום מבחני העזר על העובדות (תדירות, היקף, מנגנון, מימון, בקיאות) ומבחן הגג`, p: 2 },
+                { t: `נפקות ושיעורים (25% מול שולי + יסף) ומפת האינטרסים`, p: 1.5 },
+                { t: `מועד שינוי ה"כובע" / ראיה חיצונית, וסגירה עם ס׳ 89(ג)`, p: 1.5 },
+              ],
+            },
+            {
+              q: `סעיף ב׳ — האם תוכל ד״ר לוי לקזז את ההפסד משלושת השעונים? האם התשובה תלויה בסיווג?`, points: 4,
+              model: `התשובה תלויה בסיווג, ונשענת על עקרון הסימטריה: "אין מס — אין הפסד" (אור שרה). אם השעונים מחוץ לבסיס המס כמיטלטלין אישיים, גם ההפסד מחוץ לבסיס ואינו בר־קיזוז — מכירת מיטלטלין אישיים בהפסד אינה מולידה הפסד. אם הם נכס הוני, ההפסד הוא הפסד הון לפי ס׳ 92: מקוזז כנגד רווחי הון (תחילה כנגד הרווח הריאלי, ואחר כך כנגד הסכום האינפלציוני ביחס 1:3.5), וקדימה בלבד. אם מדובר בעסק, ההפסד בשלושת השעונים הוא חלק מחישוב הרווח העסקי השוטף ומתקזז בתוכו. מלכודת: ד״ר לוי אינה יכולה לטעון לשימוש אישי ביחס לשעונים שנמכרו ברווח, ובמקביל לדרוש הכרה בהפסד על שעונים מאותה קבוצה — הסיווג צריך להיות עקבי לכל קבוצת נכסים ותקופה.`,
+              rubric: [
+                { t: `עקרון הסימטריה — במיטלטלין אישיים אין הפסד בר־קיזוז`, p: 1.5 },
+                { t: `בסיווג הוני — ס׳ 92: הוני מול הוני, ריאלי ואז אינפלציוני, קדימה בלבד`, p: 1.5 },
+                { t: `בסיווג עסקי — חלק מהרווח העסקי; עקביות בין הטענות`, p: 1 },
+              ],
+            },
+            {
+              q: `סעיף ג׳ — הניחו שבשנה האחרונה העניקה ד״ר לוי לבנה, תושב ישראל, שעון מן האוסף במתנה. מה דין ההענקה בכל אחד מהסיווגים?`, points: 3,
+              model: `(1) מיטלטלין אישיים — מחוץ לבסיס המס, ואין אירוע מס. (2) נכס הוני — מתנה היא "מכירה" (החריג היחיד בהגדרה הוא הורשה), אך ס׳ 97(א)(5) פוטר מתנה לקרוב, ובלבד שמקבל המתנה אינו תושב חוץ. הבן נכנס לנעלי האם לעניין המחיר המקורי ויום הרכישה, כך שהמס נדחה ואינו נמחק. (3) מלאי עסקי — ס׳ 85(א) רואה במלאי שהוצא שלא בתמורה כנמכר בשווי השוק, וההכנסה פירותית. הפטור לפי 97(א)(5) שייך למישור ההוני בלבד, ולכן אינו חל על מלאי.`,
+              rubric: [
+                { t: `מיטלטלין אישיים — אין אירוע מס`, p: 1 },
+                { t: `הוני — מתנה היא מכירה, פטור 97(א)(5) (קרוב, לא תושב חוץ) ורציפות המס`, p: 1 },
+                { t: `מלאי — ס׳ 85(א): כנמכר בשווי שוק; הפטור אינו חל`, p: 1 },
+              ],
+            },
+          ],
+        },
+        {
+          n: 2, points: 15, title: `חבילת ההטבות של יואב`,
+          stem: `יואב, מהנדס בכיר, הועסק 9 שנים בחברת "נתיב דאטה" בע״מ. בשנה האחרונה להעסקתו קיבל: (1) מחשב נייד וטלפון נייד של החברה, שבהם השתמש גם לצרכים פרטיים; (2) מנוי שנתי לחדר כושר יוקרתי, שהחברה רכשה לכל עובדיה; (3) תשלום חודשי קבוע של 400 ש״ח שכונה "החזר הוצאות אינטרנט ביתי", בלי שנדרש להציג קבלות; (4) רכב צמוד. עם סיום העסקתו קיבל מענק פרישה של 450,000 ש״ח, ובהסכם נפרד עוד 600,000 ש״ח מהחברה תמורת התחייבות שלא לעבוד אצל מתחרה במשך שנתיים. יואב טוען שהסכום בגין אי־התחרות הוני — "מכרתי את חופש העיסוק שלי". לגבי הרכב הוא טוען שהשתמש בו לצורכי עבודה בלבד, ומציג יומן נסיעות מפורט.`,
+          subparts: [
+            {
+              q: `סעיף א׳ — אילו מההטבות (1)–(4) חייבות במס כהכנסת עבודה? נמקו.`, points: 7,
+              model: `ס׳ 2(2) רחב: השתכרות וכל טובת הנאה, במישרין או בעקיפין, בכסף או בשווה כסף. ההטבות נבחנות על ספקטרום: הטבה אישית חייבת; כלי עבודה נמצא בקצה השני; והטבה מעורבת חייבת, למעט זוטי דברים. אפשר להיעזר גם במבחן המצטבר — חיוניות ההנאה לתפקיד והנאה ניכרת לעובד, בבחינה אובייקטיבית. (1) המחשב הוא כלי עבודה חיוני, והשימוש הפרטי שולי; הטלפון הנייד כפוף לתקנות שווי השימוש בטלפון, הקובעות שווי מחייב. (2) חדר הכושר אינו חיוני לתפקיד ומסב הנאה אישית ניכרת — טובת הנאה חייבת, גם כשניתנה לכל העובדים. (3) תשלום קבוע ללא קבלות אינו החזר הוצאות אלא תוספת שכר. הכלל הוא שהחזר הוצאות חייב; החריג ("קיצור דרך") חל רק על החזר בפועל של הוצאה שהייתה מותרת לעובד בניכוי (שירותי בריאות כללית), ואינטרנט ביתי הוא ככלל הוצאה פרטית (ס׳ 32(1)). זה אינו גם מצב של "צינור" (סנונית), שבו העובד מוציא כסף עבור המעסיק. (4) הרכב — שווי השימוש נקבע לפי תקנות שווי השימוש ברכב. לפי עניין חכם את אור־זך (ברשימת הקריאה), התקנות קובעות חזקה חלוטה, ואין להוכיח שווי נמוך יותר ביומן נסיעות.`,
+              rubric: [
+                { t: `ס׳ 2(2) — "כל טובת הנאה", במישרין או בעקיפין`, p: 1 },
+                { t: `ספקטרום ההטבות (אישית / כלי עבודה / מעורבת) — מחשב וטלפון`, p: 1.5 },
+                { t: `חדר כושר — טובת הנאה חייבת`, p: 1 },
+                { t: `"החזר" קבוע ללא קבלות — שכר; כלל וחריג (כללית), והבחנה מ"צינור" (סנונית)`, p: 2 },
+                { t: `רכב — חזקה חלוטה; היומן אינו רלוונטי (חכם את אור־זך)`, p: 1.5 },
+              ],
+            },
+            {
+              q: `סעיף ב׳ — כיצד יסווגו התשלום בגין אי־התחרות ומענק הפרישה?`, points: 5,
+              model: `אי־תחרות: מפת האינטרסים ברורה — יואב מעדיף מסלול הוני (עד 25%) על פני המס השולי. אלא שחזקת ברנע קובעת שתקבול ממעסיק הוא פירותי, והנטל לסתור אותה כבד מאוד. מענק אי־תחרות הוא חליף שכר: דין הפיצוי כדין הפרצה שהוא בא למלא, והפרצה כאן היא הכנסת העבודה שיואב לא ירוויח אצל מתחרה. לכן זו הכנסת עבודה לפי ס׳ 2(2), וגם ס׳ 89(ג) (הפירותי גובר) מחזק זאת. מענק הפרישה: ס׳ 9(7א) פוטר מענק פרישה עד תקרה לכל שנת עבודה (9 שנים כאן). היתרה מעל התקרה חייבת, ולפי כבלי ציון ס׳ 9(7א) עצמו משמש מקור חיוב לסכום העודף — אנומליה של סעיף פטור שמשמש מקור חיוב.`,
+              rubric: [
+                { t: `מפת האינטרסים והטענה ההונית`, p: 1 },
+                { t: `חזקת ברנע — תקבול ממעסיק פירותי; נטל סתירה כבד`, p: 1.5 },
+                { t: `אי־תחרות = חליף שכר; ס׳ 89(ג)`, p: 1 },
+                { t: `ס׳ 9(7א) — פטור עד תקרה לשנת עבודה; מעל התקרה — כבלי ציון`, p: 1.5 },
+              ],
+            },
+            {
+              q: `סעיף ג׳ — מה האינטרס של החברה בסיווג ההטבות והתשלומים, ומה דין ניכוי התשלום בגין אי־התחרות אצלה?`, points: 3,
+              model: `לחברה שני אינטרסים. ראשית, חובת ניכוי מס במקור: טובת הנאה שהיא הכנסת עבודה מחייבת את המעסיק לנכות מס, ואם לא ניכה, הוא חשוף לשומה בגין אי־הניכוי. שנית, ניכוי ההוצאה אצלה: שכר והטבות הם הוצאה פירותית המותרת לפי ס׳ 17. ואולם, תשלום להסרת תחרות יוצר לחברה יתרון מתמשך, ולכן הוא הוצאה הונית שאינה מותרת בניכוי שוטף (עוף חיפה). התוצאה אינה סימטרית: אצל יואב התשלום פירותי, ואצל החברה הוא הוני. זו נקודת ביקורת ראויה.`,
+              rubric: [
+                { t: `חובת ניכוי במקור וחשיפה לשומה`, p: 1 },
+                { t: `הסרת תחרות = הוצאה הונית (עוף חיפה)`, p: 1.5 },
+                { t: `הצבעה על חוסר הסימטריה בין הצדדים`, p: 0.5 },
+              ],
+            },
+          ],
+        },
+        {
+          n: 3, points: 15, title: `ההלוואה, הגלריה והקנסות של גל הנדסה`,
+          stem: `חברת "גל הנדסה" בע״מ, חברת תכנון, החזיקה פיקדונות בנקאיים של כ־3 מיליון ש״ח שנשאו ריבית נמוכה. בשנת 2025 נטלה החברה הלוואה בנקאית של 3 מיליון ש״ח כדי לחלק דיבידנד לבעלי מניותיה, במקום לשבור את הפיקדונות. יתרת העודפים בספריה עמדה על 5 מיליון ש״ח, מהם 2 מיליון ש״ח רווחי שערוך של בניין המשרדים שבבעלותה. באותה שנה החליפה החברה את יחידות המיזוג הישנות במשרדיה ביחידות חדשות מאותו סוג, ובנתה קומת גלריה חדשה שהגדילה את שטח העבודה. עוד שילמה החברה קנסות חניה של עובדים שהוטלו בנסיעות עבודה, וכן עיצום כספי שהטילה עליה הרשות להגנת הפרטיות בשל דליפת מידע. החברה מבקשת לנכות את כל ההוצאות.`,
+          subparts: [
+            {
+              q: `סעיף א׳ — האם תותר בניכוי הריבית על ההלוואה?`, points: 7,
+              model: `ס׳ 17(1) מתיר ריבית על הון ששימש בייצור ההכנסה. חלוקת דיבידנד אינה פעולה בייצור הכנסה, ולכן לפי ע״א פז גז הכלל שולל את הניכוי. פי גלילות עידנה את הכלל במבחן השקילות הכלכלית: אם התוצאה הכלכלית זהה לתרחיש שבו החברה הייתה מממנת את החלוקה מכספיה ולוקחת הלוואה לפעילות, ייתכן שהמימון יותר. דנ״א פזגז יישבה את ההלכה בארבעה תנאים מצטברים: (1) רווחים אמיתיים מהפעילות העסקית; (2) הניתנים לחלוקה לפי דיני החברות; (3) שקילות כלכלית מלאה; (4) הנטל על הנישום. יישום: שקילות — החברה תטען שהייתה יכולה לשבור את הפיקדונות ולחלק מהם, ושהתוצאה הכלכלית זהה. אלא שהחריג דורש רווחים שהמזומנים בגינם שימשו לייצור הכנסתה, ובפי גלילות התרחיש היה חלוקה מהמזומן ואז הלוואה לפעילות. כאן המזומן מוחזק בפיקדונות פסיביים, וזו נקודת החולשה של החברה. רווחים — מתוך 5 מיליון ש״ח, 2 מיליון הם רווחי שערוך, שאינם רווחים אמיתיים מהפעילות העסקית. נותרו 3 מיליון ש״ח רווחים אמיתיים — בדיוק היקף החלוקה. לכן רק אם החברה תוכיח (הנטל עליה) שהחלוקה מומנה מהרווחים האמיתיים וכי השקילות מלאה, הריבית עשויה להיות מותרת. חלק החלוקה שיוחס לרווחי השערוך — לא. מפת האינטרסים: החברה תטען לשקילות; פקיד השומה יטען שהמזומן לא שימש בפעילות העסקית, ולכן לכל היותר ניתן לייחס את הריבית לסל ההכנסה הפסיבית מהפיקדונות.`,
+              rubric: [
+                { t: `ס׳ 17(1) והכלל השולל (פז גז)`, p: 1.5 },
+                { t: `פי גלילות — השקילות הכלכלית`, p: 1 },
+                { t: `ארבעת התנאים של דנ״א פזגז`, p: 2 },
+                { t: `יישום: טענת השקילות וחולשתה (פיקדונות פסיביים); שערוך אינו רווח אמיתי; נטל`, p: 2.5 },
+              ],
+            },
+            {
+              q: `סעיף ב׳ — מה דין הוצאות המיזוג והגלריה?`, points: 4,
+              model: `ס׳ 17(3) רישא מתיר תיקונים — החזרת הנכס לקדמותו — ואילו ס׳ 32(4) אוסר ניכוי הוצאות השבחה. מבחני העזר (תופ אפ): אופי הרכיב (עיקרי או טפל), אופי ההוצאה (חוזרת או חד־פעמית) וגובהה. יש לפצל רכיב־רכיב ולא לסווג את השיפוץ כמקשה אחת (ארטן). הגלריה החדשה היא יתרון חדש והשבחה מובהקת, ולכן הונית: לא מותרת בניכוי שוטף, נזקפת לעלות הבניין ומקבלת ביטוי בפחת. יחידות המיזוג: החלפה של יחידות מאותו סוג שומרת על הקיים, אך מדובר ברכיבים שלמים ובהחלפה חד־פעמית. אם יחידות המיזוג הן "מכונות וציוד", ס׳ 27(א) מאפשר בחילוף לנכות את עלות הישנות בניכוי הפחת והתמורה, או את עלות החדשות — לפי הנמוך (עינבר). אי־הכרה שוטפת היא שאלת עיתוי, לא שלילה מוחלטת.`,
+              rubric: [
+                { t: `17(3) רישא מול 32(4); מבחני העזר`, p: 1.5 },
+                { t: `פיצול רכיבי (ארטן) — הגלריה השבחה הונית`, p: 1.5 },
+                { t: `המיזוג — דיון; ס׳ 27(א) / פחת; עיתוי`, p: 1 },
+              ],
+            },
+            {
+              q: `סעיף ג׳ — האם יותרו בניכוי הקנסות והעיצום?`, points: 4,
+              model: `ניתוח דו־שלבי. תחילה — האם ההוצאה עומדת בס׳ 17 ובמבחן הסיכון העסקי. אחר כך — מגבלות ותקנת הציבור. ס׳ 32(16) חל רק כשעצם התשלום הוא עבירה. קנס הוא תשלום חוקי הנובע מהפרת חוק, ולכן הסעיף אינו תופס אותו. ההכרעה היא במישור תקנת הציבור: לקנס גוון עונשי־הרתעתי, והתרתו בניכוי תסכל את המדיניות (קופת מילווה — קנס על הפרת הלימות הון). העיצום הכספי של הרשות להגנת הפרטיות, אף שהוא מנהלי, נושא אותו גוון הרתעתי — ולכן לא יותר. קנסות החניה של העובדים: לחברה הם קנסות עונשיים, והנימוק ההרתעתי חל. מנגד אפשר לטעון שבידי החברה מדובר בהטבה לעובדים. במקרה כזה היא הכנסת עבודה בידיהם, ויש לבחון אם הדבר משנה את הניכוי. מבחן החומרה (אלערביה) מסייע להבחין בין סוגי הפגם.`,
+              rubric: [
+                { t: `ניתוח דו־שלבי; 32(16) אינו חל על קנס`, p: 1.5 },
+                { t: `תקנת הציבור — קופת מילווה; גם עיצום מנהלי`, p: 1.5 },
+                { t: `קנסות העובדים — דיון (הטבה לעובד / הרתעה)`, p: 1 },
+              ],
+            },
+          ],
+        },
+        {
+          n: 4, points: 15, title: `רונית מוכרת את חברת התוכנה`,
+          stem: `רונית, תושבת ישראל, מחזיקה 35% ממניות "אופק תוכנה" בע״מ, שייסדה ב־2014 בהשקעה זניחה, ומכהנת בה כמנכ״לית. ב־2025 מכרה את כל מניותיה למשקיע אמריקאי תמורת 12 מיליון ש״ח. בהסכם נקבע שהרוכש ישלם לה עוד 1.5 מיליון ש״ח תמורת התחייבותה שלא להתחרות בחברה שלוש שנים. באותה שנה מכרה רונית תיק מניות סחירות בהפסד של 800 אלף ש״ח. רונית מבקשת: לקזז את ההפסד כנגד הרווח ממכירת מניות אופק, לפרוס את הרווח על פני ארבע שנים, ולסווג את תשלום אי־התחרות כחלק מתמורת המניות.`,
+          subparts: [
+            {
+              q: `סעיף א׳ — כיצד ימוסה רווח ההון ממכירת המניות?`, points: 5,
+              model: `שרשרת חלק ה׳: "נכס" — מניות; "מכירה" — העברה בתמורה; "תמורה" — 12 מיליון ש״ח, לפי שווי שוק; יתרת המחיר המקורי — זניחה. רווח ההון הוא התמורה פחות יתרת המחיר המקורי, ומתפצל לרכיב ריאלי ולרכיב אינפלציוני. השיעור: רונית היא בעלת מניות מהותית (מחזיקה 10% ומעלה), ולכן הרווח הריאלי ימוסה ב־30% לפי ס׳ 91(ב), בתוספת מס יסף. הנוסחה הליניארית אינה רלוונטית, כי המניות נרכשו אחרי 1.1.2012. תחולה: רונית תושבת ישראל, ולכן חייבת על רווח הון מכל מקום (ס׳ 89(ב)). זהות הרוכש כזר אינה משנה את חבותה.`,
+              rubric: [
+                { t: `שרשרת נכס–מכירה–תמורה–מחיר מקורי`, p: 1.5 },
+                { t: `בעלת מניות מהותית (10%+) — 30% על הריאלי + יסף`, p: 2 },
+                { t: `אין נוסחה ליניארית (רכישה אחרי 2012); תחולה פרסונלית`, p: 1.5 },
+              ],
+            },
+            {
+              q: `סעיף ב׳ — האם תוכל רונית לקזז את ההפסד ולפרוס את הרווח?`, points: 5,
+              model: `קיזוז: ס׳ 92 — הפסד הון מקוזז כנגד רווח הון, תחילה כנגד הרווח הריאלי ואחר כך כנגד הסכום האינפלציוני ביחס 1:3.5. ההפסד מהמניות הסחירות הוא הפסד הון, והרווח ממניות אופק הוא רווח הון — קיזוז הוני מול הוני מותר. מלכודת: אין צורך בחריג של ס׳ 92(א)(4). החריג נוגע לקיזוז הפסד מניירות ערך כנגד דיבידנד או ריבית, ולפי בן דוד הוא לא חל על הכנסה בשיעור 30% של בעל מניות מהותי. פריסה: ס׳ 91(ה)(1) מאפשר ליחיד לפרוס את הרווח הריאלי על פני הנמוך מבין 4 שנות מס לבין תקופת הבעלות — כאן 4 שנים. המנגנון וולונטרי, חל על יחידים בלבד (טוונטי האנדרד), ומאפשר לנצל נקודות זיכוי ומדרגות.`,
+              rubric: [
+                { t: `ס׳ 92 — הוני מול הוני; סדר: ריאלי ואז אינפלציוני (1:3.5)`, p: 2 },
+                { t: `הבחנה מחריג 92(א)(4) ומבן דוד`, p: 1 },
+                { t: `פריסה — 91(ה)(1): הנמוך מבין 4 שנים לתקופת הבעלות; יחידים בלבד`, p: 2 },
+              ],
+            },
+            {
+              q: `סעיף ג׳ — כיצד יסווג התשלום בגין אי־התחרות?`, points: 5,
+              model: `השאלה המכרעת היא "מה נמכר?" (כץ). דין הפיצוי כדין הפרצה שבא למלא. גישה אחת רואה בהתחייבות חלק מעסקת המכר: הרוכש משלם כדי להבטיח את שווי המניות שרכש, ולכן זו תמורה נוספת עבור הנכס — רווח הון. הגישה האחרת רואה בתשלום פיצוי על הכנסה עתידית שרונית מוותרת עליה — בעיקר הכנסה מעבודה, שכן היא מנכ״לית — כלומר חליף שכר ולכן הכנסה פירותית. מפת האינטרסים: לבעלת מניות מהותית, שיעור רווח ההון 30% לעומת מס שולי של עד 47% ויסף, ולכן רונית מעדיפה את המסלול ההוני ופקיד השומה את הפירותי. חזקת ברנע מתייחסת לתקבול ממעסיק — כאן המשלם הוא הרוכש, ולכן החזקה אינה חלה ישירות, אך ההיגיון שלה (חליף שכר) רלוונטי. אם התשלום ניתן לסיווג כפול — ס׳ 89(ג): הפירותי גובר. תשובה טובה תציג את שני הכיוונים ותסגור בשובר השוויון.`,
+              rubric: [
+                { t: `"מה נמכר?" (כץ) ודין הפיצוי כדין הפרצה`, p: 1.5 },
+                { t: `שתי החלופות — תמורה למניות מול חליף שכר`, p: 1.5 },
+                { t: `מפת האינטרסים; תחולת חזקת ברנע על תשלום מצד שלישי`, p: 1 },
+                { t: `סגירה עם ס׳ 89(ג)`, p: 1 },
+              ],
+            },
+          ],
+        },
+        {
+          n: 5, points: 15, title: `משרד רואי החשבון שבבית`,
+          stem: `דנה, רואת חשבון עיוורת הזכאית לפטור לפי ס׳ 9(5), היא "בת הזוג הרשומה". לפני שנה הצטרף בעלה אלון, רואה חשבון, למשרד שהיא מנהלת, והם מפעילים אותו יחד כמקור הכנסה משותף. שני חדרים בביתם משמשים דרך קבע את המשרד, אך מרבית העבודה — פגישות עם לקוחות וביקורות — מתבצעת במשרדי הלקוחות. אלון עובד במשרה מלאה ומקבל 50% מהרווחים. לפי תנאי השוק, שכרו של רואה חשבון בוותק שלו נמוך בהרבה. בנוסף משכיר אלון דירה שקיבל בירושה מאביו. בני הזוג מבקשים חישוב נפרד להכנסות אלון, ולחלופין — להחיל את הפטור של דנה גם על חלקו ברווחי המשרד.`,
+          subparts: [
+            {
+              q: `סעיף א׳ — האם יזכו בני הזוג בחישוב נפרד להכנסת אלון מהמשרד?`, points: 8,
+              model: `נקודת המוצא היא ס׳ 65: חישוב מאוחד, והכנסת בני הזוג נחשבת להכנסת בת הזוג הרשומה. הרציונל: יכולת כלכלית משותפת וחשש מפיצול מלאכותי. ס׳ 66(א) מתיר חישוב נפרד על הכנסה מיגיעה אישית. כשלבני הזוג מקור הכנסה משותף, קובע ס׳ 66(ד) כי ס׳ 66(א) יחול "רק אם התקיימו כל אלה": (א) יגיעתו האישית של כל אחד נדרשת לייצור ההכנסה; (ב) ההכנסה של כל אחד הולמת את תרומתו; (ג) אם ההכנסה מופקת בבית המגורים — הבית משמש דרך קבע את מקור ההכנסה, ומרבית הפעילות נעשית בו. חזקות התלות הישנות בוטלו; לפני התיקון נקבע בקלס שהן ניתנות לסתירה, ובמלכיאלי שדרישת אי־התלות המהותית אינה ניתנת לסתירה, והביקורת שם הובילה לתיקון. יישום: (א) אלון עובד במשרה מלאה — מתקיים. (ב) 50% מהרווחים כשהשכר בשוק נמוך בהרבה — ספק רב, ופקיד השומה יטען לפיצול מלאכותי. בני הזוג יטענו שחלק שווה משקף שותפות ולא שכר. (ג) השאלה המקדמית היא אם ההכנסה "מופקת בבית": אם כן, התנאי אינו מתקיים, כי מרבית הפעילות מחוץ לבית. אם לא — התנאי אינו חל כלל. מסקנה: די בתנאי אחד שאינו מתקיים, והחישוב יהיה מאוחד. הנקודה החלשה היא תנאי ההלימה.`,
+              rubric: [
+                { t: `ס׳ 65 — הכלל ורציונל; ס׳ 66(א)`, p: 1.5 },
+                { t: `ס׳ 66(ד) — תנאים מצטברים לחישוב נפרד ממקור משותף`, p: 2 },
+                { t: `קלס ומלכיאלי והתיקון`, p: 1 },
+                { t: `יישום תנאי ההלימה (50% מול תנאי השוק)`, p: 1.5 },
+                { t: `יישום תנאי הבית — התנאי המקדמי (האם ההכנסה מופקת בבית); מסקנה`, p: 2 },
+              ],
+            },
+            {
+              q: `סעיף ב׳ — האם יחול פטור הנכה של דנה על חלקו של אלון ברווחים?`, points: 4,
+              model: `לא. ס׳ 9(5) הוא פטור אישי מבוסס זהות, והוא חל על הכנסה מיגיעתו האישית של הזכאי לו (פורטנוי). בחישוב מאוחד מאחדים הכנסות בלבד — לא פטורים (כספי). גם אם הכנסת אלון תיוחס לדנה כבת הזוג הרשומה, היא אינה נובעת מיגיעתה, ולכן לא תיהנה מהפטור. הצרחת פטור בין בני זוג פותחת פתח למניפולציות, והדין שולל אותה. מלכודת: חברה משפחתית (ס׳ 64א) היא מסלול שבו, בגבולות ובכפוף לאותנטיות, ניתן להגיע לתוצאה קרובה. זו נקודת תכנון ראויה לציון.`,
+              rubric: [
+                { t: `פטור אישי — מותנה ביגיעת הזכאי (פורטנוי)`, p: 1.5 },
+                { t: `מאחדים הכנסות, לא פטורים (כספי)`, p: 1.5 },
+                { t: `אין הצרחה; אזכור חברה משפחתית כנקודת תכנון`, p: 1 },
+              ],
+            },
+            {
+              q: `סעיף ג׳ — מה דין הכנסת השכירות מהדירה שירש אלון?`, points: 3,
+              model: `הכנסה פסיבית משכירות אינה יגיעה אישית, ולכן ס׳ 66(א) אינו חל עליה. ואולם, ס׳ 66(ב) מתיר חישוב נפרד על הכנסה מרכוש שהתקבל בירושה (או שהיה בבעלות שנה לפני הנישואין). אלון, שאינו בן הזוג הרשום, יכול לתבוע חישוב נפרד על הכנסה זו. במקביל יש לבחון את מסלולי המיסוי להשכרת דירת מגורים — פטור עד התקרה, מסלול 10% לפי ס׳ 122 או מסלול רגיל — כל עוד ההשכרה אינה עולה כדי עסק.`,
+              rubric: [
+                { t: `הכנסה פסיבית — 66(א) אינו חל`, p: 1 },
+                { t: `66(ב) — רכוש שהתקבל בירושה: חישוב נפרד`, p: 1.5 },
+                { t: `אזכור מסלולי השכרת דירת מגורים`, p: 0.5 },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      key: `B`, name: `חלק ב׳ — שאלות תיאורטיות`, weight: `25%`, pick: 2, words: 300,
+      note: `שתי שאלות חובה. 12 ו־13 נקודות, עד 300 מילים לשאלה.`, suggest: `כ־20 דקות לשאלה`,
+      questions: [
+        {
+          n: 1, points: 12, title: `חוקיות אינה לגיטימיות`,
+          stem: `"תכנון מס הוא זכותו של כל נישום. הנורמה הכללית בס׳ 86 מאפשרת לרשות להתעלם מעסקה חוקית לחלוטין, ובכך פוגעת בוודאות. מוטב להסתפק בנורמות אנטי־תכנוניות פרטניות." דונו בטענה.`,
+          subparts: [
+            {
+              q: `הציגו את הדין ואת התפתחות הפסיקה, והעריכו את הטענה.`, points: 12,
+              model: `מבנה: (1) הזכות לתכנן — הנישום רשאי לבחור את הדרך הזולה במס, אך יש לכך גבול. (2) ס׳ 86 מאפשר להתעלם מעסקה מלאכותית, בדויה, או כזו שאחת ממטרותיה העיקריות היא הימנעות בלתי נאותה ממס — "אף אם אינה נוגדת חוק". די בפוטנציאל הפחתת המס. (3) התפתחות: מבחן בלעדיות המטרה הפיסקלית (יואב רובינשטיין — רכישת חברה מפסידה לניצול הפסדיה) ← מבחן יסודיות הטעם המסחרי (סגנון), לצד ארבעה מבחני עזר: טעם מסחרי מוכח, שקילות כלכלית, ציפייה סבירה לרווח ומרכיב סיכון. בגוטשל הציע השופט שוהם מבחן דו־שלבי — תחילה לגיטימיות התכנון ורק אחר כך מלאכותיות — וזו עמדה, לא הלכה. במעין נקבע (ברוב) שהטבה שהמחוקק ביקש להעניק אינה מלאכותית. (4) היחס לנורמות פרטניות: ס׳ 86 שיורי, והנורמות הפרטניות (ס׳ 94ג לדיבידנד סטריפינג, ס׳ 100א למס יציאה) חלות קודם. בנוסף, לפי ינקו וייס קיום אמנת מס אינו חוסם את ס׳ 86. יש להבחין גם בין ס׳ 86 לבין סיווג לפי המהות הכלכלית, שהוא מסלול חד־סטרי — רק הרשות רשאית לטעון לו (רייזמן, גליס). (5) הערכה: בעד הטענה — ודאות, שוויון, שיקול דעת רחב לרשות. נגד — המחוקק אינו יכול לצפות כל תכנון, והנורמות הפרטניות נכתבות תמיד מאחור. הנורמה הכללית מרתיעה ומשלימה אותן. מנגנון ממתן: חידוד המבחנים בפסיקה (סגנון ומבחני העזר), והעדפת נורמות פרטניות כשהן קיימות. מסקנה מאוזנת: הבעיה אינה בעצם קיום ס׳ 86 אלא בעמימות המבחנים. הפתרון הוא חידוד המבחנים, לא ויתור על הנורמה.`,
+              rubric: [
+                { t: `הזכות לתכנן וגבולה; לשון ס׳ 86 ("אף אם אינה נוגדת חוק", די בפוטנציאל)`, p: 2.5 },
+                { t: `התפתחות המבחנים: רובינשטיין ← סגנון + מבחני העזר; גוטשל (עמדה); מעין`, p: 3.5 },
+                { t: `יחס לנורמות פרטניות (שיורי); ינקו וייס; הבחנה ממהות כלכלית (חד־סטרי)`, p: 2.5 },
+                { t: `הערכה ביקורתית — בעד ונגד, דרכים להגביר ודאות, מסקנה מנומקת`, p: 3.5 },
+              ],
+            },
+          ],
+        },
+        {
+          n: 2, points: 13, title: `בין כפל מס להימנעות כפולה`,
+          stem: `מערכת המיסוי הבין־לאומי נבנתה סביב מניעת כפל מס. בשנים האחרונות מושם דגש גובר גם על מניעת "הימנעות כפולה ממס". הציגו את הכלים שבדין הישראלי לכל אחת משתי המטרות, והעריכו אם קיים ביניהן מתח.`,
+          subparts: [
+            {
+              q: `הציגו את הכלים לכל מטרה והעריכו את היחס ביניהן.`, points: 13,
+              model: `(1) המסגרת: מאז 2003 ישראל נוקטת שיטה משולבת — פרסונלית כלפי תושבים (הכנסות מכל העולם) וטריטוריאלית כלפי תושבי חוץ. (2) כלים למניעת כפל מס: אמנות דו־צדדיות (כ־60), וס׳ 196 הקובע שאמנה שנקלטה בצו גוברת על הדין הפנימי. זיכוי ממס זר (ס׳ 199–214) — רק עד שיעור האמנה: בפ.ק. גנרטורים נגבה בברזיל 15% במקום 10%, והזיכוי ניתן רק עד 10%, והעודף נתבע כהחזר מהמדינה הזרה. הליכי הסכמה הדדית. (3) כלים למניעת הימנעות כפולה: ה־MLI (2016); פרשנות דינמית של אמנות, שבה ההימנעות הכפולה היא שיקול פרשני (הפועל אוסישקין). בתושבות — עקרון רציפות התושבות: אי אפשר להיוותר ללא תושבות (עמית), ותושבות פיסקלית כפולה אינה ניתוק, ואי־תשלום מס באף מדינה מחליש את טענת הניתוק (פלוני — לא בסילבוס). מס יציאה (ס׳ 100א) — מכירה רעיונית או דחייה ליניארית, שאינו סותר אמנות (קניג). ס׳ 86 חל גם כשקיימת אמנה (ינקו וייס). חילופי מידע אוטומטיים (FATCA, CRS) הוכרו כחוקתיים (רפובליקנים מחו״ל). מחירי העברה — עקרון אורך הזרוע, התאמה ראשית ומשנית (סי.איי סופטוור — לא בסילבוס). (4) מתח: הכלים נגד ההימנעות עלולים ליצור כפל מס. למשל, מס יציאה בישראל לצד מס במדינה החדשה על אותו רווח, או זיכוי מוגבל לשיעור האמנה שמטיל על הנישום לתבוע החזר בחו״ל. מנגד, שתי המטרות נובעות מאותו עיקרון — מיסוי פעם אחת, לא פעמיים ולא אפס — ולכן הן משלימות. הערכה: המתח קיים ביישום, לא בעיקרון, והפתרון במנגנוני תיאום (זיכוי, MAP) ולא בוויתור על אחת המטרות.`,
+              rubric: [
+                { t: `השיטה המשולבת (2003); ס׳ 196`, p: 2 },
+                { t: `כלים לכפל מס — זיכוי עד שיעור האמנה (פ.ק. גנרטורים); אמנות/MAP`, p: 3 },
+                { t: `כלים להימנעות כפולה — MLI, הפועל אוסישקין, עמית/פלוני, 100א (קניג), ינקו וייס, FATCA/CRS`, p: 4 },
+                { t: `הערכת המתח — דוגמאות, עיקרון "פעם אחת", מסקנה`, p: 4 },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      key: `C`, name: `חלק ג׳ — שאלות ממוקדות`, weight: `15%`, pick: 3, words: 120,
+      note: `ארבע שאלות — ענו על שלוש. כל שאלה 5 נקודות, עד 120 מילים.`, suggest: `כ־8 דקות לשאלה`,
+      questions: [
+        {
+          n: 1, points: 5, title: `מחוץ לבסיס המס מול פטור`,
+          stem: `הסבירו את ההבחנה בין תקבול ש"מחוץ לבסיס המס" לבין תקבול "פטור", והדגימו את נפקותה.`,
+          subparts: [{
+            q: `תשובה`, points: 5,
+            model: `תקבול מחוץ לבסיס המס אינו נכנס לרשת המס מלכתחילה: אין לו מקור מוכר (תורת המקור), או שהוא מוחרג מההגדרה — למשל מיטלטלין לשימוש אישי, המוחרגים מהגדרת "נכס" בס׳ 88 (יבדייב). תקבול פטור הוא הכנסה בבסיס המס, והמחוקק פוטר אותו בתנאים ובתקרות. למשל, מלגות לפי ס׳ 9(29) — ובקרצמר, מענק שבו נרקמה ציפייה הדדית סווג כהכנסה ממשלח יד ולא כמלגה פטורה. נפקויות: פטור מתפרש בזהירות ומחייב עמידה בתנאיו, ונדרש לו עיגון בחוק (ס׳ 245). הסימטריה חלה בשני המצבים — "אין מס, אין הפסד": פטור 9(13) שלל הפסד (אור שרה), ומכירת מיטלטלין אישיים בהפסד אינה יוצרת הפסד.`,
+            rubric: [
+              { t: `הגדרת שני המצבים והדגמה (יבדייב / ס׳ 9(29), קרצמר)`, p: 3 },
+              { t: `נפקות — פרשנות הפטור, עיגון בחוק, סימטריה בהפסדים`, p: 2 },
+            ],
+          }],
+        },
+        {
+          n: 2, points: 5, title: `שיטת הסלים בקיזוז הפסדים`,
+          stem: `מהי "שיטת הסלים" בקיזוז הפסדים, ומה תכליתה?`,
+          subparts: [{
+            q: `תשובה`, points: 5,
+            model: `הפקודה מחלקת הפסדים לשלושה סלים, ולכל סל כללי קיזוז משלו. ס׳ 28 — הפסד פירותי בישראל: מקוזז באותה שנה כנגד כל הכנסה, וקדימה רק כנגד עסק או משלח יד, בכפוף לעקרון המיצוי. ס׳ 29 — הפסד פירותי מחו״ל: תחילה כנגד הכנסה מאותו סוג בחו״ל, אחר כך כנגד הכנסה פסיבית בחו״ל; יתרה בעסק נשלט — לבחירה גם כנגד הכנסה בישראל. ס׳ 92 — הפסד הון: כנגד רווח הון בלבד, ריאלי ואז אינפלציוני, עם חריג לניירות ערך. בתוך סל המחוקק נדיב; מעבר בין סלים מותנה בתנאים נוקשים. התכלית אנטי־תכנונית: למנוע ניצול הפרשי שיעורים (הוני מול פירותי, ישראל מול חו״ל) ולשמר סימטריה.`,
+            rubric: [
+              { t: `שלושת הסלים וכלליהם (28, 29, 92)`, p: 3 },
+              { t: `התכלית — מניעת ניצול הפרשי שיעורים, סימטריה`, p: 2 },
+            ],
+          }],
+        },
+        {
+          n: 3, points: 5, title: `מס, אגרה, תשלום חובה ומחיר`,
+          stem: `מדוע חשוב לסווג תשלום לרשות כ"מס", "אגרה", "תשלום חובה" או "מחיר"? הדגימו.`,
+          subparts: [{
+            q: `תשובה`, points: 5,
+            model: `ס׳ 1 לחוק־יסוד: משק המדינה דורש שמסים, מילוות חובה, תשלומי חובה ואגרות יוטלו רק בחוק או על פיו, ובהסמכה מפורשת — כפי שנקבע בעניין אילנות הקריה. "מחיר", שהוא עסקה חופשית שיש בה תמורה ורצון חופשי, אינו כפוף לדרישה זו. נפקות נוספת: פרט 11 לתוספת השנייה לחוק תובענות ייצוגיות פותח מסלול של תובענה ייצוגית נגד רשות בגין גבייה שלא כדין של מס, אגרה או תשלום חובה, והמסלול נסגר אם התשלום הוא מחיר. דוגמאות: סגל — אגרת רדיו; חיון (בג״ץ 6451/18) — השתתפות עצמית בקופות חולים (ברון: מחיר; גרוסקופף: תשלום חובה); מרכז השלטון המקומי — תשלום עבור מים כמחיר (רוב); ישראייר — בדיקות קורונה כמחיר.`,
+            rubric: [
+              { t: `עקרון החוקיות (ס׳ 1 לחוק־יסוד) — חל על מס/אגרה/תשלום חובה, לא על מחיר`, p: 2 },
+              { t: `פרט 11 — הנפקות הדיונית`, p: 1.5 },
+              { t: `שתי דוגמאות לפחות מהפסיקה`, p: 1.5 },
+            ],
+          }],
+        },
+        {
+          n: 4, points: 5, title: `שחלוף נכסים`,
+          stem: `מהם תנאי השחלוף לפי ס׳ 96, ומדוע התוצאה היא דחיית מס ולא פטור?`,
+          subparts: [{
+            q: `תשובה`, points: 5,
+            model: `התנאים: (1) הנכס הנמכר בר־פחת; (2) נכס חלופי נרכש בתוך 12 חודשים אחרי המכירה או 4 חודשים לפניה; (3) מחירו של הנכס החלופי עולה על יתרת המחיר המקורי של הנמכר; (4) דמיון פונקציונלי — הנכס החלופי ממלא אותה פונקציה באותו עסק (צ׳רני). בלי נכס מחליף אין שחלוף (תופ אפ), והשחלוף חל על נכס הוני בלבד, לא על מלאי (אלדן). התוצאה: הרווח שלא מוסה מופחת מהמחיר המקורי של הנכס החדש, ולכן המס נדחה עד למכירתו — ואפשר לשרשר שחלופים. התכלית: לא למסות השקעה מתמשכת בעסק ולא לתמרץ החזקה בנכס ישן רק כדי לא לשלם מס, תוך שמירה על רציפות המס — ולכן דחייה ולא פטור.`,
+            rubric: [
+              { t: `ארבעת התנאים (כולל צ׳רני) ותופ אפ / אלדן`, p: 3 },
+              { t: `המנגנון (הפחתה מהמחיר המקורי) והתכלית — דחייה ולא פטור`, p: 2 },
+            ],
+          }],
+        },
+      ],
+    },
+    {
+      key: `D`, name: `חלק ד׳ — בונוס`, weight: `4%`, pick: 1, words: 120, bonus: true,
+      note: `שאלה אחת על חומרי הקריאה, עד 120 מילים. תשובה שאינה מעידה על קריאה — אפס נקודות.`, suggest: `כ־6 דקות`,
+      questions: [
+        {
+          n: 1, points: 4, title: `מבחני התושבות בעידן הגלובליזציה`,
+          stem: `במאמרו "עם שינוי העיתים משתנים אף הדינים עימהם" דן המרצה באתגרים שמציבים הגלובליזציה והנוודות הדיגיטלית למבחני התושבות. הציגו את האתגר המרכזי ואת הכיוון המוצע.`,
+          subparts: [{
+            q: `תשובה`, points: 4,
+            model: `הערה: תשובת המודל מבוססת על תקציר המאמר בסילבוס — מומלץ לבדוק מול המאמר עצמו. האתגר: מבחן מרכז החיים ננקט בעוגנים פיזיים — בית קבוע, מגורי המשפחה, עיסוק — וחזקות הימים מבוססות על נוכחות פיזית. נווד דיגיטלי, העובד מרחוק וזז בין מדינות, מערער את שניהם. מרכז חייו מפוזר, ואת הימים ניתן לתכנן. כך נוצר חשש ל"מיקום" מלאכותי ולהימנעות ממס, ואף למצב שבו אדם אינו תושב של אף מדינה — בניגוד לעקרון רציפות התושבות (עמית). הכיוון: לעדכן את מבחני התושבות למציאות הגלובלית. בהקשר זה מוזכר דוח הוועדה לרפורמה (2021), שהציע לעבור לחזקות ימים חלוטות, והמרצה מתנגד לחזקות אי־תושבות "הפוכות". יש לשלב זאת עם כלי אכיפה ושיתוף פעולה בין־לאומי.`,
+            rubric: [
+              { t: `זיהוי האתגר — עוגנים פיזיים מול נוודות דיגיטלית, חשש להימנעות`, p: 2 },
+              { t: `הכיוון — עדכון המבחנים; דוח 2021 (חזקות חלוטות) ועמדת המרצה; רציפות התושבות`, p: 2 },
+            ],
+          }],
+        },
+      ],
+    },
+  ],
+};
+
+(function () {
+  "use strict";
+  var DATA = EXAM;
+  var KEY = "mikud-sim:" + DATA.id;
+  var TOTAL = DATA.minutes * 60000;
+  var HEB = { A: "א׳", B: "ב׳", C: "ג׳", D: "ד׳" };
+  var COUNT_WORD = { 1: "אחת", 2: "שתיים", 3: "שלוש", 4: "ארבע", 5: "חמש" };
+
+  function $(id) { return document.getElementById(id); }
+  function el(tag, attrs) {
+    var e = document.createElement(tag);
+    if (attrs) for (var k in attrs) {
+      var v = attrs[k];
+      if (v == null || v === false) continue;
+      if (k === "class") e.className = v;
+      else if (k === "text") e.textContent = v;
+      else if (k.slice(0, 2) === "on") e.addEventListener(k.slice(2), v);
+      else e.setAttribute(k, v === true ? "" : v);
+    }
+    for (var i = 2; i < arguments.length; i++) {
+      var c = arguments[i];
+      if (c == null) continue;
+      if (Array.isArray(c)) c.forEach(function (x) { if (x != null) e.append(x.nodeType ? x : document.createTextNode(x)); });
+      else e.append(c.nodeType ? c : document.createTextNode(c));
+    }
+    return e;
+  }
+
+  /* ---------- state ---------- */
+  function fresh() { return { v: 1, mode: "exam", status: "idle", elapsed: 0, resumedAt: null, answers: {}, rubric: {}, peek: {}, usedMs: null }; }
+  function load() {
+    try {
+      var raw = localStorage.getItem(KEY);
+      if (!raw) return null;
+      var o = JSON.parse(raw);
+      if (!o || o.v !== 1) return null;
+      var f = fresh();
+      for (var k in o) f[k] = o[k];
+      return f;
+    } catch (e) { return null; }
+  }
+  var S = load() || fresh();
+  var saveTimer = null;
+  function save(now) {
+    clearTimeout(saveTimer);
+    var write = function () { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
+    if (now) write(); else saveTimer = setTimeout(write, 350);
+  }
+  function elapsed() { return S.elapsed + (S.status === "running" && S.resumedAt ? Date.now() - S.resumedAt : 0); }
+
+  /* ---------- helpers ---------- */
+  function words(s) { s = (s || "").trim(); return s ? s.split(/\s+/).length : 0; }
+  function fmt(ms) {
+    var neg = ms < 0; ms = Math.abs(ms);
+    var t = Math.floor(ms / 1000), h = Math.floor(t / 3600), m = Math.floor((t % 3600) / 60), s = t % 60;
+    return (neg ? "+" : "") + h + ":" + String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
+  }
+  function fmtLong(ms) {
+    var m = Math.round(ms / 60000), h = Math.floor(m / 60), r = m % 60;
+    if (h && r) return h + " שע׳ ו־" + r + " דק׳";
+    if (h) return h + " שע׳";
+    return r + " דק׳";
+  }
+  function qid(p, q) { return p.key + q.n; }
+  function aKey(p, q, i) { return qid(p, q) + "-" + i; }
+  function rKey(p, q, i, j) { return qid(p, q) + "-" + i + "-" + j; }
+  function qWords(p, q) { var n = 0; q.subparts.forEach(function (sp, i) { n += words(S.answers[aKey(p, q, i)]); }); return n; }
+  function spScore(p, q, i) { var s = 0; (q.subparts[i].rubric || []).forEach(function (r, j) { if (S.rubric[rKey(p, q, i, j)]) s += r.p; }); return s; }
+  function qScore(p, q) { var s = 0; q.subparts.forEach(function (sp, i) { s += spScore(p, q, i); }); return s; }
+  function partResult(p) {
+    var rows = p.questions.map(function (q) { return { q: q, s: qScore(p, q), w: qWords(p, q) }; });
+    var sorted = rows.slice().sort(function (a, b) { return (b.s - a.s) || (b.w - a.w) || (a.q.n - b.q.n); });
+    var top = sorted.slice(0, p.pick);
+    var counted = {}; top.forEach(function (r) { counted[r.q.n] = true; });
+    var max = p.questions.map(function (q) { return q.points; }).sort(function (a, b) { return b - a; }).slice(0, p.pick).reduce(function (a, b) { return a + b; }, 0);
+    return { rows: rows, counted: counted, score: top.reduce(function (a, r) { return a + r.s; }, 0), max: max,
+      answered: rows.filter(function (r) { return r.w > 0; }).length };
+  }
+
+  /* ---------- static structure ---------- */
+  function buildStructure() {
+    var tb = $("structBody"); tb.replaceChildren();
+    DATA.parts.forEach(function (p) {
+      var qs = p.questions.length;
+      var qText = p.pick < qs ? (COUNT_WORD[qs] + ", עונים על " + COUNT_WORD[p.pick]) : (qs === 1 ? "אחת" : COUNT_WORD[qs] + " חובה");
+      tb.append(el("tr", null,
+        el("td", null, el("b", { text: "חלק " + HEB[p.key] }), " ", p.name.split("—")[1] ? p.name.split("—")[1].trim() : ""),
+        el("td", { class: "num-c", text: p.bonus ? "בונוס " + p.weight : p.weight }),
+        el("td", { text: qText }),
+        el("td", { class: "num-c", text: "עד " + p.words }),
+        el("td", { text: p.suggest || "" })));
+    });
+  }
+
+  /* ---------- exam render ---------- */
+  var refs = {};
+  function render() {
+    refs = { ta: {}, meter: {}, qchip: {}, review: {}, peekBtn: {}, rb: {}, spScore: {}, partChip: {}, navChip: {}, qScoreChip: {} };
+    var partsBox = $("parts"); partsBox.replaceChildren();
+    var nav = $("partnav"); nav.replaceChildren();
+    var gb = $("guideBody"); gb.replaceChildren();
+
+    gb.append(
+      el("div", { class: "tbl-wrap" }, (function () { var t = $("structBody").closest("table").cloneNode(true); t.querySelector("tbody").removeAttribute("id"); return t; })()),
+      el("div", { class: "sig" }, el("span", { text: "סיווג" }), el("i", { text: "←" }), el("span", { text: "נפקות" }), el("i", { text: "←" }), el("span", { text: "מפת אינטרסים" }), el("i", { text: "←" }), el("span", { text: "חלופות" })),
+      el("div", { class: "result-actions" },
+        el("button", { class: "btn danger", type: "button", id: "resetBtn1", onclick: function () { askReset("resetConfirm1"); } }, "איפוס והתחלה מחדש")),
+      el("div", { id: "resetConfirm1", hidden: true }));
+
+    DATA.parts.forEach(function (p) {
+      var navChip = el("a", { class: "chip", href: "#part-" + p.key });
+      refs.navChip[p.key] = navChip; nav.append(navChip);
+
+      var partChip = el("span", { class: "chip soft" });
+      refs.partChip[p.key] = partChip;
+      var sec = el("section", { class: "part", id: "part-" + p.key, "aria-labelledby": "ph-" + p.key },
+        el("div", { class: "part-head" },
+          el("h2", { id: "ph-" + p.key, text: p.name + " · " + (p.bonus ? "בונוס " : "") + p.weight }),
+          el("div", { class: "part-meta" }, el("span", { text: p.note }), el("span", null, "זמן מומלץ: ", el("b", { text: p.suggest })), partChip)));
+
+      p.questions.forEach(function (q) {
+        var id = qid(p, q);
+        var single = q.subparts.length === 1;
+        var qchip = el("span", { class: "chip soft" }); refs.qchip[id] = qchip;
+        var scoreChip = el("span", { class: "chip ok", hidden: true }); refs.qScoreChip[id] = scoreChip;
+        var art = el("article", { class: "sheet q", id: "q-" + id, "aria-labelledby": "qh-" + id },
+          el("div", { class: "q-head" },
+            el("span", { class: "q-no", text: "שאלה " + q.n }),
+            el("h3", { id: "qh-" + id, text: q.title }),
+            el("span", { class: "q-pts", text: q.points + " נק׳" })),
+          el("p", { class: "stem", text: q.stem }));
+
+        q.subparts.forEach(function (sp, i) {
+          var k = aKey(p, q, i);
+          var showLabel = !(single && sp.q === "תשובה");
+          var ta = el("textarea", { class: "ans", id: "ans-" + k, rows: "4", dir: "rtl",
+            "aria-label": showLabel ? null : "תשובה לשאלה " + q.n + ": " + q.title,
+            placeholder: single ? "כתבו כאן את התשובה…" : "תשובה ל" + (sp.q.split("—")[0].trim() || "סעיף") + "…" });
+          ta.value = S.answers[k] || "";
+          ta.addEventListener("input", function () {
+            S.answers[k] = ta.value; save(); autosize(ta); updateCounts(p, q);
+          });
+          refs.ta[k] = ta;
+
+          var rbBox = el("fieldset", { class: "rubric" }, el("legend", { text: "מחוון · " + sp.points + " נק׳" }));
+          (sp.rubric || []).forEach(function (r, j) {
+            var rk = rKey(p, q, i, j);
+            var cb = el("input", { type: "checkbox", id: "rb-" + rk });
+            cb.checked = !!S.rubric[rk];
+            cb.addEventListener("change", function () { if (cb.checked) S.rubric[rk] = 1; else delete S.rubric[rk]; save(); updateScores(); });
+            refs.rb[rk] = cb;
+            rbBox.append(el("label", { class: "rb", for: "rb-" + rk }, cb, el("span", { text: r.t }), el("b", { text: r.p + " נק׳" })));
+          });
+          var sps = el("span", { class: "sp-score" }); refs.spScore[k] = sps;
+          var review = el("div", { class: "review", hidden: true },
+            el("h4", { text: single ? "תשובת מודל" : "תשובת מודל · " + (sp.q.split("—")[0].trim()) }),
+            el("p", { text: sp.model }), rbBox, sps);
+          refs.review[k] = review;
+
+          art.append(el("div", { class: "sp" },
+            showLabel ? el("label", { for: "ans-" + k }, el("span", { text: sp.q }), el("em", { text: sp.points + " נק׳" })) : null,
+            ta, review));
+        });
+
+        var meter = el("div", { class: "meter" }, el("div", { class: "track" }, el("span")), el("small"));
+        refs.meter[id] = meter;
+        var peek = el("button", { class: "btn quiet", type: "button", hidden: true, "aria-expanded": "false",
+          onclick: function () {
+            S.peek[id] = !S.peek[id]; save(); applyReviewVisibility();
+          } });
+        refs.peekBtn[id] = peek;
+        art.append(el("div", { class: "q-foot" }, meter, qchip, scoreChip, peek));
+        sec.append(art);
+      });
+      partsBox.append(sec);
+    });
+  }
+
+  function autosize(ta) { ta.style.height = "auto"; ta.style.height = Math.max(ta.scrollHeight + 2, 0) + "px"; }
+  function autosizeAll() { for (var k in refs.ta) autosize(refs.ta[k]); }
+
+  function updateCounts(p, q) {
+    var id = qid(p, q), w = qWords(p, q), lim = p.words;
+    var m = refs.meter[id];
+    m.classList.toggle("over", w > lim);
+    m.classList.toggle("near", w <= lim && w >= lim * 0.9);
+    m.querySelector(".track span").style.width = Math.min(100, (w / lim) * 100) + "%";
+    m.querySelector("small").textContent = w > lim ? (w + " / " + lim + " מילים · חריגה של " + (w - lim)) : (w + " / " + lim + " מילים");
+    var chip = refs.qchip[id];
+    if (S.status === "submitted") { chip.hidden = true; }
+    else { chip.hidden = false; chip.className = w > 0 ? "chip ok" : "chip soft"; chip.textContent = w > 0 ? "בכתיבה" : "טרם נענתה"; }
+    updatePartCounts(p);
+  }
+  function updatePartCounts(p) {
+    var r = partResult(p), chip = refs.partChip[p.key], nav = refs.navChip[p.key];
+    var txt;
+    if (p.pick < p.questions.length) {
+      txt = "נענו " + r.answered + " מתוך " + p.pick + " נדרשות";
+      chip.className = r.answered > p.pick ? "chip warm" : (r.answered === p.pick ? "chip ok" : "chip soft");
+      if (r.answered > p.pick) txt += " · עניתם על יותר מהנדרש";
+    } else {
+      txt = "נענו " + r.answered + " מתוך " + p.questions.length;
+      chip.className = r.answered === p.questions.length ? "chip ok" : "chip soft";
+    }
+    chip.textContent = txt;
+    nav.replaceChildren(el("span", { text: "חלק " + HEB[p.key] }), el("span", { class: "num", text: r.answered + "/" + Math.min(p.pick, p.questions.length) }));
+    nav.className = r.answered >= Math.min(p.pick, p.questions.length) ? "chip ok" : "chip";
+  }
+  function updateAllCounts() { DATA.parts.forEach(function (p) { p.questions.forEach(function (q) { updateCounts(p, q); }); }); }
+
+  function applyReviewVisibility() {
+    var submitted = S.status === "submitted";
+    DATA.parts.forEach(function (p) {
+      p.questions.forEach(function (q) {
+        var id = qid(p, q);
+        var open = submitted || (S.mode === "practice" && !!S.peek[id]);
+        q.subparts.forEach(function (sp, i) {
+          var k = aKey(p, q, i);
+          refs.review[k].hidden = !open;
+          refs.ta[k].readOnly = submitted;
+          (sp.rubric || []).forEach(function (r, j) { refs.rb[rKey(p, q, i, j)].disabled = !submitted; });
+        });
+        var pb = refs.peekBtn[id];
+        pb.hidden = submitted || S.mode !== "practice";
+        pb.textContent = S.peek[id] ? "הסתרת תשובת המודל" : "הצצה בתשובת המודל";
+        pb.setAttribute("aria-expanded", S.peek[id] ? "true" : "false");
+      });
+    });
+  }
+
+  function updateScores() {
+    if (S.status !== "submitted") return;
+    var total = 0, bonus = 0, box = $("partsScore"); box.replaceChildren();
+    DATA.parts.forEach(function (p) {
+      var r = partResult(p);
+      if (p.bonus) bonus += r.score; else total += r.score;
+      p.questions.forEach(function (q, idx) {
+        var id = qid(p, q), s = r.rows[idx].s;
+        var c = refs.qScoreChip[id]; c.hidden = false;
+        var counted = p.pick >= p.questions.length || r.counted[q.n];
+        c.className = counted ? "chip ok" : "chip soft";
+        c.textContent = "ציון " + s + "/" + q.points + (p.pick < p.questions.length ? (counted ? " · נספרת" : " · לא נספרת") : "");
+        q.subparts.forEach(function (sp, i) { refs.spScore[aKey(p, q, i)].textContent = "בסעיף זה: " + spScore(p, q, i) + " מתוך " + sp.points; });
+      });
+      var why = p.pick < p.questions.length ? ("נספרות " + COUNT_WORD[p.pick] + " השאלות עם הציון הגבוה") : (p.bonus ? "בונוס מעל 100" : "שתי השאלות נספרות");
+      box.append(el("div", { class: "ps" },
+        el("span", { class: "lbl", text: p.name }),
+        el("span", { class: "val", text: r.score + " / " + r.max }),
+        el("div", { class: "track" }, el("span", { style: "width:" + (r.max ? (r.score / r.max) * 100 : 0) + "%" })),
+        el("span", { class: "why", text: why })));
+    });
+    $("scoreBig").replaceChildren(document.createTextNode(String(total)), el("small", { text: " / 100" }));
+    $("scoreBonus").textContent = "בונוס: " + bonus + " / 4 · סה״כ " + (total + bonus);
+    $("scoreTime").textContent = "זמן כתיבה: " + fmtLong(S.usedMs || 0) + (S.usedMs > TOTAL ? " (חריגה של " + fmtLong(S.usedMs - TOTAL) + ")" : " מתוך 3 שעות");
+    var tw = 0; DATA.parts.forEach(function (p) { p.questions.forEach(function (q) { tw += qWords(p, q); }); });
+    $("scoreWords").textContent = "מילים שנכתבו: " + tw.toLocaleString("he-IL");
+  }
+
+  /* ---------- notices ---------- */
+  var noticeLevel = null, dismissed = {};
+  function notice(text, actions) {
+    var n = $("notice");
+    if (!text) { n.hidden = true; return; }
+    $("noticeText").textContent = text;
+    var a = $("noticeActions"); a.replaceChildren();
+    (actions || []).forEach(function (x) { a.append(x); });
+    n.hidden = false;
+  }
+  function closeBtn(level) { return el("button", { class: "btn quiet", type: "button", onclick: function () { dismissed[level] = true; notice(null); } }, "סגירה"); }
+
+  /* ---------- clock ---------- */
+  function tick() {
+    var clock = $("clock"), prog = $("progress"), fill = $("progFill");
+    if (S.status === "submitted") {
+      clock.className = "clock done"; clock.textContent = "הוגש";
+      fill.style.width = "100%"; prog.className = "progress"; return;
+    }
+    var rem = TOTAL - elapsed();
+    var level = rem <= 0 ? "over" : rem <= 10 * 60000 ? "crit" : rem <= 30 * 60000 ? "warn" : "";
+    clock.className = "clock" + (level ? " " + level : "");
+    clock.textContent = S.status === "idle" ? fmt(TOTAL) : fmt(rem);
+    clock.setAttribute("aria-label", rem <= 0 ? "חריגה מהזמן" : "זמן שנותר");
+    fill.style.width = S.status === "idle" ? "0%" : Math.min(100, (elapsed() / TOTAL) * 100) + "%";
+    prog.className = "progress" + (level ? " " + level : "");
+    if (S.status === "running" && level !== noticeLevel) {
+      noticeLevel = level;
+      if (level && !dismissed[level] && !confirmOpen) {
+        if (level === "warn") notice("נותרו 30 דקות. זה הזמן לעבור לחלקים ג׳ ו־ד׳ אם עוד לא הגעתם אליהם.", [closeBtn("warn")]);
+        if (level === "crit") notice("נותרו 10 דקות. סיימו משפטים פתוחים ודאגו שכל שאלה נדרשת קיבלה לפחות שלד תשובה.", [closeBtn("crit")]);
+        if (level === "over") notice("הזמן נגמר. בבחינה האמיתית הייתם מגישים עכשיו. אפשר להמשיך לכתוב, והחריגה תירשם.", [
+          el("button", { class: "btn primary", type: "button", onclick: doSubmit }, "הגשה עכשיו"), closeBtn("over")]);
+      }
+    }
+  }
+
+  /* ---------- wake lock ---------- */
+  var wake = null;
+  function wakeOn() {
+    try {
+      if (!("wakeLock" in navigator) || wake) return;
+      navigator.wakeLock.request("screen").then(function (w) { wake = w; w.addEventListener("release", function () { wake = null; }); }).catch(function () {});
+    } catch (e) {}
+  }
+  function wakeOff() { try { if (wake) wake.release(); } catch (e) {} wake = null; }
+
+  /* ---------- actions ---------- */
+  var confirmOpen = false;
+  function start() {
+    S.mode = $("modePractice").checked ? "practice" : "exam";
+    S.status = "running"; S.elapsed = 0; S.resumedAt = Date.now();
+    save(true); applyStatus(); wakeOn();
+    window.scrollTo(0, 0);
+    var first = refs.ta[aKey(DATA.parts[0], DATA.parts[0].questions[0], 0)];
+    if (first && window.matchMedia("(min-width: 700px)").matches) first.focus({ preventScroll: true });
+  }
+  function pause() {
+    if (S.status === "running") {
+      S.elapsed += Date.now() - S.resumedAt; S.resumedAt = null; S.status = "paused"; wakeOff();
+    } else if (S.status === "paused") {
+      S.resumedAt = Date.now(); S.status = "running"; wakeOn();
+    }
+    save(true); applyStatus();
+  }
+  function askSubmit() {
+    confirmOpen = true;
+    var answered = 0; DATA.parts.forEach(function (p) { answered += partResult(p).answered; });
+    var rem = TOTAL - elapsed();
+    notice((rem > 0 ? "נותרו " + fmt(rem) + ". " : "") + "עניתם על " + answered + " שאלות. אחרי ההגשה התשובות ננעלות ונפתחים תשובות המודל והמחוון.", [
+      el("button", { class: "btn primary", type: "button", onclick: doSubmit }, "הגשה סופית"),
+      el("button", { class: "btn quiet", type: "button", onclick: function () { confirmOpen = false; notice(null); noticeLevel = null; } }, "חזרה לכתיבה")]);
+  }
+  function doSubmit() {
+    confirmOpen = false;
+    if (S.status === "running") { S.elapsed += Date.now() - S.resumedAt; S.resumedAt = null; }
+    S.usedMs = S.elapsed; S.status = "submitted";
+    save(true); wakeOff(); notice(null); applyStatus();
+    var r = $("result"); if (r.scrollIntoView) r.scrollIntoView({ block: "start" });
+  }
+  function askReset(boxId) {
+    var box = $(boxId);
+    box.replaceChildren(el("div", { class: "inline-confirm" },
+      el("span", { text: "למחוק את כל התשובות והסימונים ולהתחיל בחינה חדשה? אי אפשר לשחזר." }),
+      el("button", { class: "btn danger", type: "button", onclick: doReset }, "מחיקה והתחלה מחדש"),
+      el("button", { class: "btn quiet", type: "button", onclick: function () { box.hidden = true; } }, "ביטול")));
+    box.hidden = false;
+  }
+  function doReset() {
+    var mode = S.mode;
+    S = fresh(); S.mode = mode;
+    try { localStorage.removeItem(KEY); } catch (e) {}
+    noticeLevel = null; dismissed = {}; confirmOpen = false;
+    wakeOff(); notice(null);
+    render(); updateAllCounts(); applyStatus();
+    $("copyBox").hidden = true; $("copyMsg").textContent = "";
+    $("resetConfirm2").hidden = true;
+    window.scrollTo(0, 0);
+  }
+  function answersText() {
+    var out = [DATA.title, ""];
+    DATA.parts.forEach(function (p) {
+      out.push("== " + p.name + " ==");
+      p.questions.forEach(function (q) {
+        out.push("", "שאלה " + q.n + " — " + q.title + " (" + qWords(p, q) + " מילים)");
+        q.subparts.forEach(function (sp, i) {
+          var a = (S.answers[aKey(p, q, i)] || "").trim();
+          if (q.subparts.length > 1) out.push(sp.q.split("—")[0].trim() + ":");
+          out.push(a || "(לא נענה)");
+        });
+      });
+      out.push("");
+    });
+    return out.join("\n");
+  }
+  function copyAnswers() {
+    var txt = answersText(), box = $("copyBox"), msg = $("copyMsg");
+    var fallback = function () { box.value = txt; box.hidden = false; box.focus(); box.select(); msg.textContent = "סמנו והעתיקו מהתיבה"; };
+    try {
+      navigator.clipboard.writeText(txt).then(function () { msg.textContent = "הועתק"; box.hidden = true; }, fallback);
+    } catch (e) { fallback(); }
+  }
+
+  /* ---------- status → UI ---------- */
+  function applyStatus() {
+    var st = S.status;
+    $("cover").hidden = st !== "idle";
+    $("exam").hidden = st === "idle";
+    $("result").hidden = st !== "submitted";
+    $("pauseBtn").hidden = !(st === "running" || st === "paused");
+    $("pauseBtn").textContent = st === "paused" ? "המשך" : "השהיה";
+    $("submitBtn").hidden = !(st === "running" || st === "paused");
+    $("toResultBtn").hidden = st !== "submitted";
+    document.body.classList.toggle("paused", st === "paused");
+    $("barSub").textContent = st === "idle" ? "מועד ג׳ · 180 דקות" : (S.mode === "practice" ? "מצב תרגול" : "תנאי בחינה") + (st === "paused" ? " · מושהה" : st === "submitted" ? " · בדיקה עצמית" : "");
+    $(S.mode === "practice" ? "modePractice" : "modeExam").checked = true;
+    if (st === "paused" && !confirmOpen) notice("הבחינה מושהית. הזמן לא רץ.", [el("button", { class: "btn primary", type: "button", onclick: pause }, "המשך")]);
+    else if (st === "running" && !confirmOpen && $("noticeText").textContent.indexOf("מושהית") >= 0) notice(null);
+    applyReviewVisibility();
+    updateAllCounts();
+    updateScores();
+    tick();
+    if (st !== "idle") requestAnimationFrame(autosizeAll);
+  }
+
+  /* ---------- boot ---------- */
+  buildStructure();
+  render();
+  $("startBtn").addEventListener("click", start);
+  $("pauseBtn").addEventListener("click", pause);
+  $("submitBtn").addEventListener("click", askSubmit);
+  $("copyBtn").addEventListener("click", copyAnswers);
+  $("resetBtn2").addEventListener("click", function () { askReset("resetConfirm2"); });
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "visible") { if (S.status === "running") wakeOn(); tick(); }
+  });
+  window.addEventListener("resize", function () { if (S.status !== "idle") autosizeAll(); });
+  applyStatus();
+  if (S.status === "running") wakeOn();
+  setInterval(tick, 1000);
+})();
+</script>
+</body>
+</html>
