@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>סרטוני חזרה — דיני מיסים</title>
+<style>
+  :root{color-scheme:dark;--bg:#12151c;--surface:#1b2029;--surface2:#232a36;--text:#eef1f6;--muted:#9aa3b2;--accent:#8b5cf6;--accent2:#6366f1}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--text);font-family:"Noto Sans Hebrew",-apple-system,"Segoe UI",Arial,sans-serif;line-height:1.6;padding:0 0 64px}
+  header.top{padding:28px 20px 8px;max-width:960px;margin:0 auto}
+  header.top a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+  header.top a.back:hover{color:var(--text)}
+  h1{font-size:1.7rem;font-weight:800;margin:10px 0 4px}
+  p.sub{color:var(--muted);font-size:.95rem}
+  main{max-width:960px;margin:0 auto;padding:20px}
+  .ep{background:var(--surface);border:1px solid #2a3140;border-radius:16px;padding:20px;margin-bottom:18px}
+  .ep h2{font-size:1.15rem;margin-bottom:4px}
+  .ep .meta{color:var(--muted);font-size:.85rem;margin-bottom:12px}
+  .ep video{width:100%;border-radius:12px;background:#000;display:block}
+  .ep .topics{margin-top:10px;font-size:.88rem;color:var(--muted)}
+  .ep .topics b{color:var(--text)}
+  .badge{display:inline-block;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:.75rem;font-weight:700;padding:3px 12px;border-radius:999px;margin-bottom:8px}
+  footer{text-align:center;color:var(--muted);font-size:.8rem;margin-top:32px}
+  footer a{color:#a78bfa}
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="back" href="index.html">→ חזרה לדף הראשי</a>
+  <h1>🎬 סרטוני חזרה — דיני מיסים</h1>
+  <p class="sub">סדרת סרטוני חזרה מאוירים לבחינה ב־13.10 — קריינות בעברית, מותאם לקשב וריכוז.</p>
+</header>
+<main id="list"></main>
+<footer>חומרי החזרה מבוססים על <a href="index.html">law.medicom.vip</a></footer>
+<script>
+const EPISODES = [
+  {
+    n: 1,
+    title: "שאלות ותשובות — 5 סוגיות שוות נקודות",
+    file: "dinei-misim-ep1.mp4",
+    dur: "כ־7:40 דקות",
+    topics: "סיווג הכנסה הונית מול פירותית · ניכוי הוצאות · פחת · רווח הון · קיזוז הפסדים"
+  }
+  // פרקים הבאים: להוסיף כאן אובייקט נוסף, למשל:
+  // ,{ n: 2, title: "...", file: "dinei-misim-ep2.mp4", dur: "כ־8 דקות", topics: "..." }
+];
+const list = document.getElementById('list');
+EPISODES.slice().reverse().forEach(ep => {
+  const d = document.createElement('div');
+  d.className = 'ep';
+  d.innerHTML =
+    '<span class="badge">פרק ' + ep.n + '</span>' +
+    '<h2>' + ep.title + '</h2>' +
+    '<div class="meta">' + ep.dur + '</div>' +
+    '<video controls preload="none" src="' + ep.file + '"></video>' +
+    '<div class="topics"><b>נושאים:</b> ' + ep.topics + '</div>';
+  list.appendChild(d);
+});
+</script>
+</body>
+</html>
